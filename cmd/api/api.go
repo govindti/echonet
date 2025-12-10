@@ -12,18 +12,19 @@ import (
 
 type Application struct {
 	config config
-	store store.Storage
+	store  store.Storage
 }
 
 type config struct {
 	addr string
+	db   dbConfig
 }
 
 type dbConfig struct {
-	addr string
+	addr         string
 	maxOpenConns int
 	maxIdleConns int
-	maxIdleTime string
+	maxIdleTime  string
 }
 
 func (app *Application) mount() *chi.Mux {
@@ -43,7 +44,7 @@ func (app *Application) mount() *chi.Mux {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
 	})
-	
+
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 	})
