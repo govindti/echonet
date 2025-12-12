@@ -18,7 +18,7 @@ type Application struct {
 type config struct {
 	addr string
 	db   dbConfig
-	env string
+	env  string
 }
 
 type dbConfig struct {
@@ -45,9 +45,15 @@ func (app *Application) mount() *chi.Mux {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
 	})
+	r.Route("/api", func(r chi.Router) {
 
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/health", app.healthCheckHandler)
+		r.Route("/v1", func(r chi.Router) {
+			r.Get("/health", app.healthCheckHandler)
+
+			r.Route("/posts", func(r chi.Router) {
+				r.Post("/", app.createPostHandler)
+			})
+		})
 	})
 
 	return r
