@@ -7,8 +7,9 @@ import (
 )
 
 type CreatePostPayload struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title   string   `json:"title"`
+	Content string   `json:"content"`
+	Tags    []string `json:"tags"`
 }
 
 func (app *Application) createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,7 @@ func (app *Application) createPostHandler(w http.ResponseWriter, r *http.Request
 	post := &store.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
+		Tags:    payload.Tags,
 		UserID:  1, // should be change after auth
 	}
 	ctx := r.Context()
