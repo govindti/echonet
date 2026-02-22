@@ -16,7 +16,7 @@ type Post struct {
 	Tags      []string  `json:"tags"`
 	CreatedAt string    `json:"created_at"`
 	UpdatedAt string    `json:"updated_at"`
-	Comments  []Comment `json:comments`
+	Comments  []Comment `json:"comments"`
 }
 
 type PostStore struct {
