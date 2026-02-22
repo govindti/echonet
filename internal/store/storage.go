@@ -6,23 +6,27 @@ import (
 	"errors"
 )
 
-var(
+var (
 	ErrNotFound = errors.New("resource not found")
 )
 
 type Storage struct {
 	Posts interface {
 		Create(context.Context, *Post) error
-		GetByID(context.Context, int64)(*Post, error)
+		GetByID(context.Context, int64) (*Post, error)
 	}
 	Users interface {
 		Create(context.Context, *User) error
+	}
+	Comments interface {
+		GetByPostID(context.Context, int64) ([]Comment, error)
 	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		Posts: &PostStore{db},
-		Users: &UsersStore{db},
+		Users: &UserStore{db},
+		Comments: &CommentsStore{db},
 	}
 }
