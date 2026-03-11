@@ -59,6 +59,11 @@ func (app *Application) mount() *chi.Mux {
 					r.Patch("/", app.updatePostHandler)
 				})
 			})
+			r.Route("/users", func(r chi.Router) {
+				r.Route("/{userID}", func(r chi.Router){
+					r.Get("/", app.getUserHandler)
+				})
+			})
 		})
 	})
 
