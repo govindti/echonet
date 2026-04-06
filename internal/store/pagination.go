@@ -3,12 +3,18 @@ package store
 import (
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
 
-type PaginatedFeedQuery struct{
-	Limit int `form:"limit" validate:"gte=1,lte=20"`
-	Offset int `form:"offset" validate:"gte=0"`
-	Sort string `form:"sort" validate:"oneof=asc desc"`
+type PaginatedFeedQuery struct {
+	Limit  int      `json:"limit" validate:"gte=1,lte=20"`
+	Offset int      `json:"offset" validate:"gte=0"`
+	Sort   string   `json:"sort" validate:"oneof=asc desc"`
+	Tags   []string `json:"tags" validate:"max=5"`
+	Search string   `json:"search" validate:"max=100"`
+	Since  string   `json:"since" validate:"max=100"`
+	Untill string   `json:"until" validate:"max=100"`
 }
 
 func (fq PaginatedFeedQuery) Parse(r *http.Request) (PaginatedFeedQuery, error) {
@@ -37,5 +43,33 @@ func (fq PaginatedFeedQuery) Parse(r *http.Request) (PaginatedFeedQuery, error) 
 		fq.Sort = sort
 	}
 
+	tags := qs.Get("tags")
+	if tags != "" {
+		fq.Tags = strings.Split(tags, ",")
+	}
+
+	search := qs.Get("Search")
+	if search != "" {
+		fq.Search = search
+	}
+
+	sinse := qs.Get("since")
+	if sinse != "" {
+		fq.Since = parseTime(sinse)
+	}
+
+	untill := qs.Get("untill")
+	if untill != "" {
+		fq.Untill = parseTime(untill)
+	}
+
 	return fq, nil
+}
+
+func parseTime(s string) string {
+	t, err := time.Parse(time.DateTime, s)
+	if err != nil {
+		return ""
+	}
+	return t.Format(time.RFC3339)
 }
