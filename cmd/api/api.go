@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/govindti/echonet/internal/store"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Application struct {
@@ -49,6 +51,9 @@ func (app *Application) mount() *chi.Mux {
 
 		r.Route("/v1", func(r chi.Router) {
 			r.Get("/health", app.healthCheckHandler)
+
+			docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
+			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 			r.Route("/posts", func(r chi.Router) {
 				r.Post("/", app.createPostHandler)
