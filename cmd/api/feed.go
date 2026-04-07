@@ -22,7 +22,7 @@ func (app *Application) getUserFeedHandler(w http.ResponseWriter, r *http.Reques
 
 	if err := Validate.Struct(fq); err != nil {
 		app.badRequestResponse(w, r, err)
-		return 
+		return
 	}
 
 	ctx := r.Context()

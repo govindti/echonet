@@ -23,7 +23,7 @@ func (app *Application) conflictResponse(w http.ResponseWriter, r *http.Request,
 	writeJSONError(w, http.StatusConflict, err.Error())
 }
 
-func (app *Application) notFoundResponse (w http.ResponseWriter, r *http.Request, err error) {
+func (app *Application) notFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
 	log.Printf("not found error: %s path %s error: %s ", r.Method, r.URL.Path, err)
 
 	writeJSONError(w, http.StatusNotFound, "resource not found")

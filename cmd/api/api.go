@@ -8,6 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
 	"github.com/govindti/echonet/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -18,9 +20,10 @@ type Application struct {
 }
 
 type config struct {
-	addr string
-	db   dbConfig
-	env  string
+	addr   string
+	db     dbConfig
+	env    string
+	apiURL string
 }
 
 type dbConfig struct {
@@ -84,6 +87,11 @@ func (app *Application) mount() *chi.Mux {
 }
 
 func (app *Application) run(mux *chi.Mux) error {
+	// Docs
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Host = app.config.apiURL
+	docs.SwaggerInfo.BasePath = "/v1"
+
 	// Implementation of the run method
 
 	srv := &http.Server{

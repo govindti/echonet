@@ -59,7 +59,7 @@ func (s *PostStore) GetUserFeed(ctx context.Context, userID int64, fq PaginatedF
 	defer rows.Close()
 
 	var feed []*PostWithMetaData
-	for rows.Next(){
+	for rows.Next() {
 		var p PostWithMetaData
 		err := rows.Scan(
 			&p.ID,
