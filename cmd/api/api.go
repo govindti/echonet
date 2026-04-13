@@ -55,7 +55,7 @@ func (app *Application) mount() *chi.Mux {
 		r.Route("/v1", func(r chi.Router) {
 			r.Get("/health", app.healthCheckHandler)
 
-			docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
+			docsURL := fmt.Sprintf("http://%s/api/v1/docs/doc.json", app.config.apiURL)
 			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 			r.Route("/posts", func(r chi.Router) {
@@ -90,7 +90,7 @@ func (app *Application) run(mux *chi.Mux) error {
 	// Docs
 	docs.SwaggerInfo.Version = version
 	docs.SwaggerInfo.Host = app.config.apiURL
-	docs.SwaggerInfo.BasePath = "/v1"
+	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	// Implementation of the run method
 

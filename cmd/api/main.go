@@ -16,7 +16,7 @@ const version = "0.0.1"
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-//	@BasePath					/v1
+//	@BasePath					/api/v1
 //	@securityDefinitions.apikey	ApiKeyAuth
 //	@in							header
 //	@name						Authorization
@@ -36,7 +36,8 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
-		env: env.GetString("ENV", "development"),
+		env:    env.GetString("ENV", "development"),
+		apiURL: env.GetString("EXTERNAL_URL", "localhost:4000"),
 	}
 
 	db, err := db.New(

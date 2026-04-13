@@ -20,12 +20,26 @@ type CreatePostPayload struct {
 	Tags    []string `json:"tags"`
 }
 
-type updatePostPayload struct {
+type UpdatePostPayload struct {
 	Title   *string  `json:"title" validate:"omitempty,max=100"`
 	Content *string  `json:"content" validate:"omitempty,max=1000"`
 	Tags    []string `json:"tags"`
 }
 
+// CreatePost godoc
+//
+//	@Summary		Creates a post
+//	@Description	Creates a post
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		CreatePostPayload	true	"Post payload"
+//	@Success		201		{object}	store.Post
+//	@Failure		400		{object}	error
+//	@Failure		401		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts [post]
 func (app *Application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
@@ -57,6 +71,19 @@ func (app *Application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// GetPost godoc
+//
+//	@Summary		Fetches a post
+//	@Description	Fetches a post by ID
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Post ID"
+//	@Success		200	{object}	store.Post
+//	@Failure		404	{object}	error
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{id} [get]
 func (app *Application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
@@ -74,6 +101,19 @@ func (app *Application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeletePost godoc
+//
+//	@Summary		Deletes a post
+//	@Description	Delete a post by ID
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Post ID"
+//	@Success		204	{object}	string
+//	@Failure		404	{object}	error
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{id} [delete]
 func (app *Application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "postID")
 	id, err := strconv.ParseInt(idParam, 10, 64)
@@ -96,10 +136,26 @@ func (app *Application) deletePostHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// UpdatePost godoc
+//
+//	@Summary		Updates a post
+//	@Description	Updates a post by ID
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int					true	"Post ID"
+//	@Param			payload	body		UpdatePostPayload	true	"Post payload"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error
+//	@Failure		401		{object}	error
+//	@Failure		404		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{id} [patch]
 func (app *Application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
-	var payload updatePostPayload
+	var payload UpdatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
