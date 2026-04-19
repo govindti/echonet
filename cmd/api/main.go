@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
-
 	"github.com/govindti/echonet/internal/db"
 	"github.com/govindti/echonet/internal/env"
 	"github.com/govindti/echonet/internal/store"
+	"go.uber.org/zap"
 )
 
 const version = "0.0.1"
@@ -40,6 +39,12 @@ func main() {
 		apiURL: env.GetString("EXTERNAL_URL", "localhost:4000"),
 	}
 
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
+	// Database
+
 	db, err := db.New(
 		cfg.db.addr,
 		cfg.db.maxOpenConns,
@@ -47,19 +52,20 @@ func main() {
 		cfg.db.maxIdleTime,
 	)
 	if err != nil {
-		log.Panic(err)
+		logger.Fatal(err)
 	}
 
 	defer db.Close()
-	log.Println("DB connection pool established!")
+	logger.Info("DB connection pool established!")
 
 	store := store.NewStorage(db)
 
 	app := &Application{
 		config: cfg,
 		store:  store,
+		logger: logger,
 	}
 
 	mux := app.mount()
-	log.Fatal(app.run(mux))
+	logger.Fatal(app.run(mux))
 }

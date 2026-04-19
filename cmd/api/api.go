@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.uber.org/zap"
 
 	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
 	"github.com/govindti/echonet/internal/store"
@@ -17,6 +17,7 @@ import (
 type Application struct {
 	config config
 	store  store.Storage
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -101,6 +102,6 @@ func (app *Application) run(mux *chi.Mux) error {
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute * 1,
 	}
-	log.Printf("Server has started at %s", app.config.addr)
+	app.logger.Infow("Server has started ", "addr", app.config.addr, "env", app.config.env)
 	return srv.ListenAndServe()
 }
