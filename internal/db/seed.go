@@ -80,8 +80,18 @@ func Seed(store store.Storage, db *sql.DB) {
 	users := generateUsers(100)
 
 	for _, user := range users {
-		if err := store.Users.Create(ctx, user); err != nil {
+		tx, err := db.BeginTx(ctx, nil)
+		if err != nil {
+			log.Println("Error beginning transaction:", err)
+			return
+		}
+		if err := store.Users.Create(ctx, tx, user); err != nil {
+			_ = tx.Rollback()
 			log.Println("Error creating user:", err)
+			return
+		}
+		if err := tx.Commit(); err != nil {
+			log.Println("Error committing transaction:", err)
 			return
 		}
 	}
@@ -109,11 +119,15 @@ func generateUsers(num int) []*store.User {
 	users := make([]*store.User, num)
 
 	for i := 0; i < num; i++ {
-		users[i] = &store.User{
+		user := &store.User{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i),
 			Email:    usernames[i%len(usernames)] + fmt.Sprintf("%d", i) + "@example.com",
-			Password: "password123",
 		}
+		if err := user.Password.Set("password123"); err != nil {
+			log.Println("Error setting password:", err)
+			return nil
+		}
+		users[i] = user
 	}
 
 	return users

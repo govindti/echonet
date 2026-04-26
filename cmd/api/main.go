@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/govindti/echonet/internal/db"
 	"github.com/govindti/echonet/internal/env"
 	"github.com/govindti/echonet/internal/store"
@@ -37,6 +39,9 @@ func main() {
 		},
 		env:    env.GetString("ENV", "development"),
 		apiURL: env.GetString("EXTERNAL_URL", "localhost:4000"),
+		mail: mailConfig{
+			exp: time.Hour * 24 * 3, // 3 days
+		},
 	}
 
 	// Logger
