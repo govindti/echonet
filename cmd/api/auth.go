@@ -10,9 +10,14 @@ import (
 )
 
 type RegisterUserPayload struct {
-	Username string `json:"username" validate:"required, max=100"`
-	Email    string `json:"email" validate:"required, max=255"`
-	Password string `json:"password" validate:"required, min=3, max=72"`
+	Username string `json:"username" validate:"required,max=100"`
+	Email    string `json:"email" validate:"required,max=255"`
+	Password string `json:"password" validate:"required,min=3,max=72"`
+}
+
+type UserWithToken struct {
+	*store.User
+	Token string `json:"token"`
 }
 
 // registerUserHandler godoc
@@ -23,10 +28,10 @@ type RegisterUserPayload struct {
 // @Accept			json
 // @Produce		json
 // @Param			payload	body	RegisterUserPayload	true	"User credentials"
-// @Sucuss			201 {object} store.User "User registed"
+// @Sucuss			201 {object} UserWithToken "User registed"
 // @Failure		400	{object}	error
 // @Failure		500	{object}	error
-// @Router			/api/v1/authentication/user [get]
+// @Router			/authentication/user [post]
 func (app *Application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	var payload RegisterUserPayload
 	if err := readJSON(w, r, &payload); err != nil {
@@ -70,7 +75,12 @@ func (app *Application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := app.jsonResponse(w, http.StatusCreated, nil); err != nil {
+	userWithToken := UserWithToken{
+		User:  user,
+		Token: plainToken,
+	}
+
+	if err := app.jsonResponse(w, http.StatusCreated, userWithToken); err != nil {
 		app.internalServerError(w, r, err)
 	}
 }
