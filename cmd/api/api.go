@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
+	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -18,14 +19,16 @@ type Application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mailer mailer.Client
 }
 
 type config struct {
-	addr   string
-	db     dbConfig
-	env    string
-	apiURL string
-	mail   mailConfig
+	addr        string
+	db          dbConfig
+	env         string
+	apiURL      string
+	mail        mailConfig
+	frontendUrl string
 }
 
 type dbConfig struct {
@@ -36,7 +39,13 @@ type dbConfig struct {
 }
 
 type mailConfig struct {
-	exp time.Duration
+	sendGrid  sendGridConfig
+	fromEmail string
+	exp       time.Duration
+}
+
+type sendGridConfig struct {
+	apiKey string
 }
 
 func (app *Application) mount() *chi.Mux {

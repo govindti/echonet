@@ -5,6 +5,7 @@ import (
 
 	"github.com/govindti/echonet/internal/db"
 	"github.com/govindti/echonet/internal/env"
+	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/store"
 	"go.uber.org/zap"
 )
@@ -39,8 +40,13 @@ func main() {
 		},
 		env:    env.GetString("ENV", "development"),
 		apiURL: env.GetString("EXTERNAL_URL", "localhost:4000"),
+		frontendUrl: env.GetString("FRONTEND_URL", "localhost:4000"),
 		mail: mailConfig{
 			exp: time.Hour * 24 * 3, // 3 days
+			fromEmail: env.GetString("SENDGRID_FROM_EMAIL", ""),
+			sendGrid: sendGridConfig{
+				apiKey:    env.GetString("SENDGRID_API_KEY", ""),
+			},
 		},
 	}
 
@@ -65,10 +71,13 @@ func main() {
 
 	store := store.NewStorage(db)
 
+	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
+
 	app := &Application{
 		config: cfg,
 		store:  store,
 		logger: logger,
+		mailer: mailer,
 	}
 
 	mux := app.mount()
