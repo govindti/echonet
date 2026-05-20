@@ -234,7 +234,6 @@ func (s *UserStore) Delete(ctx context.Context, userID int64) error {
 	})
 }
 
-
 func (s *UserStore) delete(ctx context.Context, tx *sql.Tx, id int64) error {
 	query := `DELETE FROM users WHERE id = $1`
 

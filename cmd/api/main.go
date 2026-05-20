@@ -38,14 +38,14 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
-		env:    env.GetString("ENV", "development"),
-		apiURL: env.GetString("EXTERNAL_URL", "localhost:4000"),
+		env:         env.GetString("ENV", "development"),
+		apiURL:      env.GetString("EXTERNAL_URL", "localhost:4000"),
 		frontendUrl: env.GetString("FRONTEND_URL", "localhost:4000"),
 		mail: mailConfig{
-			exp: time.Hour * 24 * 3, // 3 days
+			exp:       time.Hour * 24 * 3, // 3 days
 			fromEmail: env.GetString("SENDGRID_FROM_EMAIL", ""),
 			sendGrid: sendGridConfig{
-				apiKey:    env.GetString("SENDGRID_API_KEY", ""),
+				apiKey: env.GetString("SENDGRID_API_KEY", ""),
 			},
 		},
 	}
