@@ -32,7 +32,7 @@ func (app *Application) notFoundResponse(w http.ResponseWriter, r *http.Request,
 func (app *Application) unAuthorizedErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Warnf("unauthorized error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusNotFound, "unAuthorized")
+	writeJSONError(w, http.StatusUnauthorized, "unAuthorized")
 }
 
 func (app *Application) unAuthorizedBasicErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
@@ -40,5 +40,5 @@ func (app *Application) unAuthorizedBasicErrorResponse(w http.ResponseWriter, r 
 
 	w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
 
-	writeJSONError(w, http.StatusNotFound, "unAuthorized")
+	writeJSONError(w, http.StatusUnauthorized, "unAuthorized")
 }

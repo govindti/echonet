@@ -14,6 +14,7 @@ func (app *Application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				app.unAuthorizedBasicErrorResponse(w, r, fmt.Errorf("authorization missing auth header"))
+				return
 			}
 			//  parse it -> get the base64
 			parts := strings.Split(authHeader, " ")
@@ -38,6 +39,7 @@ func (app *Application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 				return
 			}
 
+			next.ServeHTTP(w, r)
 		})
 	}
 }
