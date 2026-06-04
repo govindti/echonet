@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// healthcheckHandler godoc
+// healthcheckHandler echonet
 //
 //	@Summary		Healthcheck
 //	@Description	Healthcheck endpoint

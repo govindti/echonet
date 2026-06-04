@@ -10,16 +10,18 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
+	"github.com/govindti/echonet/internal/auth"
 	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Application struct {
-	config config
-	store  store.Storage
-	logger *zap.SugaredLogger
-	mailer mailer.Client
+	config        config
+	store         store.Storage
+	logger        *zap.SugaredLogger
+	mailer        mailer.Client
+	authenticator auth.Authenticator
 }
 
 type config struct {
@@ -34,6 +36,12 @@ type config struct {
 
 type authconfig struct {
 	basic basicConfig
+	token tokenConfig
+}
+type tokenConfig struct {
+	secret string
+	exp    time.Duration
+	iss    string
 }
 
 type basicConfig struct {
@@ -110,6 +118,7 @@ func (app *Application) mount() *chi.Mux {
 			// public routes
 			r.Route("/authentication", func(r chi.Router) {
 				r.Post("/user", app.registerUserHandler)
+				r.Post("/token", app.createTokenHandler)
 			})
 		})
 	})

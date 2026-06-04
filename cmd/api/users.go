@@ -13,7 +13,7 @@ type userKey string
 
 const userCtx userKey = "user"
 
-// getUserHandler godoc
+// getUserHandler echonet
 //
 //	@Summary		Fetches a user profile
 //	@Description	Fetches a user profile by ID
@@ -39,7 +39,7 @@ type FollowUser struct {
 	ID int64 `json:"user_id,string"`
 }
 
-// FollowUser godoc
+// FollowUser echonet
 //
 //	@Summary		Follows a user
 //	@Description	Follows a user by ID
@@ -133,7 +133,7 @@ func (app *Application) usersContextMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// ActivateUser godoc
+// ActivateUser echonet
 //
 //	@Summary		Activates/Register a user
 //	@Description	Activates/Register a user by invitation token

@@ -26,7 +26,7 @@ type UpdatePostPayload struct {
 	Tags    []string `json:"tags"`
 }
 
-// CreatePost godoc
+// CreatePost echonet
 //
 //	@Summary		Creates a post
 //	@Description	Creates a post
@@ -71,7 +71,7 @@ func (app *Application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// GetPost godoc
+// GetPost echonet
 //
 //	@Summary		Fetches a post
 //	@Description	Fetches a post by ID
@@ -101,7 +101,7 @@ func (app *Application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DeletePost godoc
+// DeletePost echonet
 //
 //	@Summary		Deletes a post
 //	@Description	Delete a post by ID
@@ -136,7 +136,7 @@ func (app *Application) deletePostHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// UpdatePost godoc
+// UpdatePost echonet
 //
 //	@Summary		Updates a post
 //	@Description	Updates a post by ID

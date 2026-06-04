@@ -6,7 +6,7 @@ import (
 	"github.com/govindti/echonet/internal/store"
 )
 
-// getUserFeedHandler godoc
+// getUserFeedHandler echonet
 //
 //	@Summary		Fetches the user feed
 //	@Description	Fetches the user feed
