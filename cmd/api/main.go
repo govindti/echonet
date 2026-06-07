@@ -23,7 +23,7 @@ const version = "0.0.1"
 //	@securityDefinitions.apikey	ApiKeyAuth
 //	@in							header
 //	@name						Authorization
-//	@description
+//	@description				Enter: Bearer {token}
 
 func main() {
 
@@ -58,6 +58,7 @@ func main() {
 				secret: env.GetString("AUTH_TOKEN_SECRET", "example"),
 				exp:    time.Hour * 24 * 7, // 7 days
 				iss:    "echonet",
+				aud:    "echonet",
 			},
 		},
 	}
@@ -85,7 +86,7 @@ func main() {
 
 	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
 
-	JWTAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
+	JWTAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.aud, cfg.auth.token.iss)
 
 	app := &Application{
 		config:        cfg,

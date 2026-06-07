@@ -26,12 +26,17 @@ type User struct {
 }
 
 type password struct {
-	text *string
-	hash []byte
+	text    *string
+	hash    []byte
+	hashStr string
 }
 
 func (p *password) Compare(text string) error {
-	return bcrypt.CompareHashAndPassword(p.hash, []byte(text))
+	h := p.hash
+	if len(h) == 0 && p.hashStr != "" {
+		h = []byte(p.hashStr)
+	}
+	return bcrypt.CompareHashAndPassword(h, []byte(text))
 }
 
 func (p *password) Set(text string) error {
@@ -266,7 +271,7 @@ func (s *UserStore) GetByEmail(ctx context.Context, email string) (*User, error)
 		&user.ID,
 		&user.Username,
 		&user.Email,
-		&user.Password.hash,
+		&user.Password.hashStr,
 		&user.CreatedAt,
 	)
 	if err != nil {

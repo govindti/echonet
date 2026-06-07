@@ -42,6 +42,7 @@ type tokenConfig struct {
 	secret string
 	exp    time.Duration
 	iss    string
+	aud    string
 }
 
 type basicConfig struct {
@@ -103,6 +104,10 @@ func (app *Application) mount() *chi.Mux {
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Put("/activate/{token}", app.activateUserHandler)
+				r.Group(func(r chi.Router) {
+					r.Use(app.AuthTokenMiddleware)
+					r.Get("/feed", app.getUserFeedHandler)
+				})
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Use(app.AuthTokenMiddleware)
 					r.Use(app.usersContextMiddleware)
@@ -110,12 +115,7 @@ func (app *Application) mount() *chi.Mux {
 					r.Get("/", app.getUserHandler)
 					r.Put("/follow", app.followUserHandler)
 					r.Put("/unfollow", app.unfollowUserHandler)
-
 				})
-			})
-			r.Group(func(r chi.Router) {
-				r.Use(app.AuthTokenMiddleware)
-				r.Get("/feed", app.getUserFeedHandler)
 			})
 
 			// public routes

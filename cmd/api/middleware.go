@@ -19,14 +19,22 @@ func (app *Application) AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		//  parse it -> get the base64
+		//  parse it -> get the token
 		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			app.unAuthorizedBasicErrorResponse(w, r, fmt.Errorf("authorization header is malformed"))
+		var token string
+		switch len(parts) {
+		case 1:
+			token = parts[0]
+		case 2:
+			if parts[0] != "Bearer" {
+				app.unAuthorizedErrorResponse(w, r, fmt.Errorf("authorization header is malformed"))
+				return
+			}
+			token = parts[1]
+		default:
+			app.unAuthorizedErrorResponse(w, r, fmt.Errorf("authorization header is malformed"))
 			return
 		}
-
-		token := parts[1]
 
 		jwtToken, err := app.authenticator.ValidateToken(token)
 		if err != nil {

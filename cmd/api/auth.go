@@ -167,7 +167,7 @@ func (app *Application) createTokenHandler(w http.ResponseWriter, r *http.Reques
 		"iat": time.Now().Unix(),
 		"nbf": time.Now().Unix(),
 		"iss": app.config.auth.token.iss,
-		"aud": app.config.auth.token.iss,
+		"aud": app.config.auth.token.aud,
 	}
 
 	token, err := app.authenticator.GenerateToken(claims)
@@ -176,7 +176,7 @@ func (app *Application) createTokenHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := app.jsonResponse(w, http.StatusCreated, token); err != nil {
+	if err := app.jsonResponse(w, http.StatusCreated, map[string]string{"token": token}); err != nil {
 		app.internalServerError(w, r, err)
 	}
 }
