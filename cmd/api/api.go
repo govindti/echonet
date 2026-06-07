@@ -92,6 +92,7 @@ func (app *Application) mount() *chi.Mux {
 			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 			r.Route("/posts", func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware)
 				r.Post("/", app.createPostHandler)
 				r.Route("/{postID}", func(r chi.Router) {
 					r.Use(app.postsContextMiddleware)
