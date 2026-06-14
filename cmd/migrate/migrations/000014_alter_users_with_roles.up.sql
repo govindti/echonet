@@ -6,7 +6,7 @@ ADD
 UPDATE users
     SET role_id = (
     SELECT id FROM roles WHERE name = 'user'
-    )
+    );
 
 ALTER TABLE users
 ALTER COLUMN 
