@@ -122,6 +122,7 @@ func generateUsers(num int) []*store.User {
 		user := &store.User{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i),
 			Email:    usernames[i%len(usernames)] + fmt.Sprintf("%d", i) + "@example.com",
+			RoleID:   1,
 		}
 		if err := user.Password.Set("password123"); err != nil {
 			log.Println("Error setting password:", err)
