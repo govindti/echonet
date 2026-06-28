@@ -13,12 +13,14 @@ import (
 	"github.com/govindti/echonet/internal/auth"
 	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/store"
+	"github.com/govindti/echonet/internal/store/cache"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Application struct {
 	config        config
 	store         store.Storage
+	cacheStorage  cache.Storage
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator
@@ -32,6 +34,14 @@ type config struct {
 	mail        mailConfig
 	frontendUrl string
 	auth        authconfig
+	redisCfg    redisConfig
+}
+
+type redisConfig struct {
+	addr    string
+	pw      string
+	db      int
+	enabled bool
 }
 
 type authconfig struct {
