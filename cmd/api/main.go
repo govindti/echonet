@@ -7,6 +7,7 @@ import (
 	"github.com/govindti/echonet/internal/db"
 	"github.com/govindti/echonet/internal/env"
 	"github.com/govindti/echonet/internal/mailer"
+	"github.com/govindti/echonet/internal/ratelimiter"
 	"github.com/govindti/echonet/internal/store"
 	"github.com/govindti/echonet/internal/store/cache"
 	"github.com/redis/go-redis/v9"
@@ -47,9 +48,10 @@ func main() {
 			db:      env.GetInt("REDIS_DB", 0),
 			enabled: env.GetBool("REDIS_ENABLED", false),
 		},
-		env:         env.GetString("ENV", "development"),
-		apiURL:      env.GetString("EXTERNAL_URL", "localhost:4000"),
-		frontendUrl: env.GetString("FRONTEND_URL", "localhost:4000"),
+		rateLimiterEnabled: env.GetBool("RATE_LIMITER_ENABLED", true),
+		env:                env.GetString("ENV", "development"),
+		apiURL:             env.GetString("EXTERNAL_URL", "localhost:4000"),
+		frontendUrl:        env.GetString("FRONTEND_URL", "localhost:4000"),
 		mail: mailConfig{
 			exp:       time.Hour * 24 * 3, // 3 days
 			fromEmail: env.GetString("SENDGRID_FROM_EMAIL", ""),
@@ -98,6 +100,12 @@ func main() {
 		defer rdb.Close()
 	}
 
+	// Rate limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		env.GetInt("RATE_LIMIT_REQUESTS_PER_TIME_FRAME", 20),
+		time.Second*5,
+	)
+
 	store := store.NewStorage(db)
 	cacheStorage := cache.NewRedisStorage(rdb)
 	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
@@ -110,6 +118,7 @@ func main() {
 		logger:        logger,
 		mailer:        mailer,
 		authenticator: JWTAuthenticator,
+		rateLimiter:   rateLimiter,
 	}
 
 	mux := app.mount()

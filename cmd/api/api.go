@@ -17,6 +17,7 @@ import (
 	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
 	"github.com/govindti/echonet/internal/auth"
 	"github.com/govindti/echonet/internal/mailer"
+	"github.com/govindti/echonet/internal/ratelimiter"
 	"github.com/govindti/echonet/internal/store"
 	"github.com/govindti/echonet/internal/store/cache"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -29,17 +30,19 @@ type Application struct {
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator
+	rateLimiter   ratelimiter.Limiter
 }
 
 type config struct {
-	addr        string
-	db          dbConfig
-	env         string
-	apiURL      string
-	mail        mailConfig
-	frontendUrl string
-	auth        authconfig
-	redisCfg    redisConfig
+	addr               string
+	db                 dbConfig
+	env                string
+	apiURL             string
+	mail               mailConfig
+	frontendUrl        string
+	auth               authconfig
+	redisCfg           redisConfig
+	rateLimiterEnabled bool
 }
 
 type redisConfig struct {
@@ -90,6 +93,7 @@ func (app *Application) mount() *chi.Mux {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(app.RateLimiterMiddleware)
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
