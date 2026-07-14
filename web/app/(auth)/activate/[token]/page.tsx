@@ -1,10 +1,11 @@
 import Link from "next/link";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
 async function activateUser(token: string) {
-  const res = await fetch(
-    `http://localhost:4000/api/v1/users/activate/${token}`,
-    { method: "PUT" }
-  );
+  const res = await fetch(`${API_BASE}/api/v1/users/activate/${token}`, {
+    method: "PUT",
+  });
   return res.ok;
 }
 

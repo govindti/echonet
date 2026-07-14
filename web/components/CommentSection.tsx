@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Comment } from "@/lib/types";
+import { API_BASE } from "@/lib/client-api";
 
 function timeAgo(dateStr: string): string {
   const now = new Date();
@@ -71,7 +72,7 @@ export default function CommentSection({
     setPending(true);
 
     try {
-      const res = await fetch(`/api/v1/posts/${postId}/comments`, {
+      const res = await fetch(`${API_BASE}/api/v1/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

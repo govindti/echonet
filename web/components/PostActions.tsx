@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { API_BASE } from "@/lib/client-api";
 
 export default function PostActions({ postId }: { postId: number }) {
   const [pending, setPending] = useState(false);
@@ -13,7 +14,7 @@ export default function PostActions({ postId }: { postId: number }) {
     setPending(true);
 
     try {
-      const res = await fetch(`/api/v1/posts/${postId}`, {
+      const res = await fetch(`${API_BASE}/api/v1/posts/${postId}`, {
         method: "DELETE",
         credentials: "include",
       });

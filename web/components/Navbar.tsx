@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { API_BASE } from "@/lib/client-api";
 
 export default function Navbar() {
   const [user, setUser] = useState<{ id: number; username: string } | null>(
@@ -27,7 +28,7 @@ export default function Navbar() {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const userId = payload.sub;
-      fetch(`/api/v1/users/${userId}`)
+      fetch(`${API_BASE}/api/v1/users/${userId}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((body) => {
           if (body?.data) setUser(body.data);

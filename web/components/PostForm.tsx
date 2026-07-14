@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { API_BASE } from "@/lib/client-api";
 
 export default function PostForm({
   mode,
@@ -35,7 +36,7 @@ export default function PostForm({
 
     try {
       const url =
-        mode === "create" ? "/api/v1/posts" : `/api/v1/posts/${postId}`;
+        mode === "create" ? `${API_BASE}/api/v1/posts` : `${API_BASE}/api/v1/posts/${postId}`;
       const method = mode === "create" ? "POST" : "PATCH";
 
       const res = await fetch(url, {

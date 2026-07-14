@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { API_BASE } from "@/lib/client-api";
 
 export default function FollowButton({ userId }: { userId: number }) {
   const [pending, setPending] = useState(false);
@@ -10,7 +11,7 @@ export default function FollowButton({ userId }: { userId: number }) {
   async function handleFollow() {
     setPending(true);
     try {
-      const res = await fetch(`/api/v1/users/${userId}/follow`, {
+      const res = await fetch(`${API_BASE}/api/v1/users/${userId}/follow`, {
         method: "PUT",
         credentials: "include",
       });
@@ -31,7 +32,7 @@ export default function FollowButton({ userId }: { userId: number }) {
   async function handleUnfollow() {
     setPending(true);
     try {
-      const res = await fetch(`/api/v1/users/${userId}/unfollow`, {
+      const res = await fetch(`${API_BASE}/api/v1/users/${userId}/unfollow`, {
         method: "PUT",
         credentials: "include",
       });

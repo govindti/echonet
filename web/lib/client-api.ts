@@ -1,13 +1,13 @@
-import { cookies } from "next/headers";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-export async function apiFetch<T>(
+export async function clientFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith("token="))
+    ?.split("=")[1];
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -21,6 +21,7 @@ export async function apiFetch<T>(
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
+    credentials: "include",
   });
 
   if (res.status === 204) {

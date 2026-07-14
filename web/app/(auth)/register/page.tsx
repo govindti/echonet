@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { API_BASE } from "@/lib/client-api";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     setPending(true);
 
     try {
-      const res = await fetch("/api/v1/authentication/user", {
+      const res = await fetch(`${API_BASE}/api/v1/authentication/user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { API_BASE } from "@/lib/client-api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ export default function LoginPage() {
     setPending(true);
 
     try {
-      const res = await fetch("/api/v1/authentication/token", {
+      const res = await fetch(`${API_BASE}/api/v1/authentication/token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
