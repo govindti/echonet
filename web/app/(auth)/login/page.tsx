@@ -16,75 +16,47 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setPending(true);
-
     try {
       const res = await fetch(`${API_BASE}/api/v1/authentication/token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const body = await res.json();
-
-      if (!res.ok) {
-        setError(body.error || "Login failed");
-        return;
-      }
-
+      if (!res.ok) { setError(body.error || "Login failed"); return; }
       document.cookie = `token=${body.data.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
       router.push("/");
       router.refresh();
-    } catch {
-      setError("Network error. Please try again.");
-    } finally {
-      setPending(false);
-    }
+    } catch { setError("Network error. Please try again."); }
+    finally { setPending(false); }
   }
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md animate-fade-in">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-2xl font-bold text-white shadow-lg shadow-brand-600/25">
+      <div className="w-full max-w-sm animate-fade-in">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-brand-600/30">
             E
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white">
-            Welcome back
-          </h1>
-          <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-            Sign in to your EchoNet account
-          </p>
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-white">Welcome back</h1>
+          <p className="mt-1.5 text-sm text-surface-500 dark:text-surface-400">Sign in to your EchoNet account</p>
         </div>
 
-        <div className="rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-800 dark:bg-surface-900">
+        <div className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-7 shadow-sm">
           {error && (
-            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
-              <div className="flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                  />
-                </svg>
-                {error}
-              </div>
+            <div className="mb-5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-400 flex items-center gap-2">
+              <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+              </svg>
+              {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-surface-700 dark:text-surface-300"
-              >
-                Email address
+              <label htmlFor="email" className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
+                Email
               </label>
               <input
                 id="email"
@@ -94,15 +66,11 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder-surface-400 transition focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/10 dark:border-surface-700 dark:bg-surface-800 dark:text-white dark:placeholder-surface-500 dark:focus:border-brand-500 dark:focus:bg-surface-800 dark:focus:ring-brand-500/10"
+                className="w-full rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 px-4 py-3 text-sm text-surface-900 dark:text-white placeholder-surface-400 dark:placeholder-surface-500 focus:border-brand-500 focus:bg-white dark:focus:bg-surface-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
               />
             </div>
-
             <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-medium text-surface-700 dark:text-surface-300"
-              >
+              <label htmlFor="password" className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                 Password
               </label>
               <input
@@ -113,51 +81,30 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full rounded-xl border border-surface-300 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder-surface-400 transition focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/10 dark:border-surface-700 dark:bg-surface-800 dark:text-white dark:placeholder-surface-500 dark:focus:border-brand-500 dark:focus:bg-surface-800 dark:focus:ring-brand-500/10"
+                className="w-full rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 px-4 py-3 text-sm text-surface-900 dark:text-white placeholder-surface-400 dark:placeholder-surface-500 focus:border-brand-500 focus:bg-white dark:focus:bg-surface-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
               />
             </div>
-
             <button
               type="submit"
               disabled={pending}
-              className="w-full rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700 hover:shadow-xl hover:shadow-brand-600/30 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               {pending ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg
-                    className="h-4 w-4 animate-spin-slow"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
+                  <svg className="h-4 w-4 animate-spin-slow" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                   Signing in...
                 </span>
-              ) : (
-                "Sign in"
-              )}
+              ) : "Sign in"}
             </button>
           </form>
         </div>
 
-        <p className="mt-6 text-center text-sm text-surface-500 dark:text-surface-400">
+        <p className="mt-5 text-center text-sm text-surface-500 dark:text-surface-400">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-          >
+          <Link href="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors">
             Create one
           </Link>
         </p>

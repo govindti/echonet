@@ -6,24 +6,29 @@ import PostActions from "@/components/PostActions";
 
 export const dynamic = "force-dynamic";
 
-function timeAgo(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr + "Z");
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return date.toLocaleDateString();
+const AVATAR_COLORS = [
+  "bg-violet-500", "bg-pink-500", "bg-sky-500", "bg-emerald-500",
+  "bg-amber-500", "bg-rose-500", "bg-teal-500", "bg-indigo-500",
+];
+function avatarColor(name: string) {
+  let n = 0;
+  for (let i = 0; i < name.length; i++) n += name.charCodeAt(i);
+  return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
-export default async function PostDetailPage(props: {
-  params: Promise<{ id: string }>;
-}) {
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr + "Z").getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const m = Math.floor(seconds / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}d ago`;
+  return new Date(dateStr + "Z").toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" });
+}
+
+export default async function PostDetailPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
 
   let post: Post;
@@ -31,114 +36,91 @@ export default async function PostDetailPage(props: {
     post = await apiFetch<Post>(`/api/v1/posts/${id}`);
   } catch {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-100 dark:bg-surface-800">
-          <svg
-            className="h-8 w-8 text-surface-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1}
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-            />
+      <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+        <div className="mx-auto mb-4 h-16 w-16 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
+          <svg className="h-8 w-8 text-surface-400" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
           </svg>
         </div>
-        <h1 className="mb-2 text-xl font-bold text-surface-900 dark:text-white">
-          Post not found
-        </h1>
-        <p className="mb-6 text-surface-500 dark:text-surface-400">
-          This post may have been deleted.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
-        >
-          Back to feed
+        <h1 className="text-xl font-bold text-surface-900 dark:text-white mb-2">Post not found</h1>
+        <p className="text-surface-500 dark:text-surface-400 mb-6">This post may have been deleted.</p>
+        <Link href="/" className="inline-flex items-center gap-2 rounded-xl bg-brand-600 hover:bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors">
+          ← Back to feed
         </Link>
       </div>
     );
   }
 
+  const username = post.user?.username || "unknown";
+  const color = avatarColor(username);
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <Link
-        href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-surface-500 transition hover:text-brand-600 dark:text-surface-400 dark:hover:text-brand-400"
-      >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-          />
+    <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors mb-5">
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
         </svg>
-        Back to feed
+        Feed
       </Link>
 
-      <article className="rounded-2xl border border-surface-200 bg-white p-6 dark:border-surface-800 dark:bg-surface-900 sm:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href={`/profile/${post.user_id}`}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700 transition hover:bg-brand-200 dark:bg-brand-900/50 dark:text-brand-300 dark:hover:bg-brand-900/70"
-            >
-              {post.user?.username?.charAt(0).toUpperCase() || "?"}
-            </Link>
-            <div>
-              <Link
-                href={`/profile/${post.user_id}`}
-                className="text-sm font-semibold text-surface-800 transition hover:text-brand-600 dark:text-surface-200 dark:hover:text-brand-400"
-              >
-                {post.user?.username || "unknown"}
+      <article className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 overflow-hidden">
+        {/* Post header */}
+        <div className="p-6 pb-0">
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex items-center gap-3">
+              <Link href={`/profile/${post.user_id}`}>
+                <div className={`h-11 w-11 rounded-full ${color} flex items-center justify-center text-white font-bold text-base shadow-sm ring-2 ring-white dark:ring-surface-900`}>
+                  {username.charAt(0).toUpperCase()}
+                </div>
               </Link>
-              <div className="flex items-center gap-2 text-xs text-surface-400 dark:text-surface-500">
-                <time>{timeAgo(post.created_at)}</time>
-                {post.updated_at !== post.created_at && (
-                  <>
-                    <span>&middot;</span>
-                    <span className="italic">edited</span>
-                  </>
-                )}
+              <div>
+                <Link href={`/profile/${post.user_id}`} className="text-sm font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  {username}
+                </Link>
+                <div className="flex items-center gap-1.5 text-xs text-surface-400 dark:text-surface-500 mt-0.5">
+                  <time>{timeAgo(post.created_at)}</time>
+                  {post.updated_at !== post.created_at && (
+                    <><span>·</span><span className="italic">edited</span></>
+                  )}
+                </div>
               </div>
             </div>
+            <PostActions postId={post.id} />
           </div>
 
-          <PostActions postId={post.id} />
-        </div>
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-white leading-tight mb-4">
+            {post.title}
+          </h1>
 
-        <h1 className="mb-4 text-2xl font-bold leading-tight tracking-tight text-surface-900 dark:text-white sm:text-3xl">
-          {post.title}
-        </h1>
-
-        <div className="whitespace-pre-wrap text-base leading-relaxed text-surface-600 dark:text-surface-300">
-          {post.content}
-        </div>
-
-        {post.tags && post.tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-950/50 dark:text-brand-300"
-              >
-                #{tag}
-              </span>
-            ))}
+          <div className="text-base text-surface-600 dark:text-surface-300 leading-relaxed whitespace-pre-wrap">
+            {post.content}
           </div>
-        )}
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {post.tags.map((tag) => (
+                <span key={tag} className="rounded-lg bg-brand-50 dark:bg-brand-950/40 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Stats bar */}
+        <div className="mx-6 mt-5 py-3 border-t border-surface-100 dark:border-surface-800 flex items-center gap-4 text-sm text-surface-500 dark:text-surface-400">
+          <div className="flex items-center gap-1.5">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z" />
+            </svg>
+            <span>{post.comments?.length || 0} {post.comments?.length === 1 ? "comment" : "comments"}</span>
+          </div>
+        </div>
+
+        <div className="px-6 pb-6">
+          <CommentSection postId={post.id} initialComments={post.comments || []} />
+        </div>
       </article>
-
-      <CommentSection postId={post.id} initialComments={post.comments || []} />
     </div>
   );
 }
