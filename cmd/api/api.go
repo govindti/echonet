@@ -12,10 +12,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 
 	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
 	"github.com/govindti/echonet/internal/auth"
+	"github.com/govindti/echonet/internal/env"
 	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/ratelimiter"
 	"github.com/govindti/echonet/internal/store"
@@ -93,6 +95,14 @@ func (app *Application) mount() *chi.Mux {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{env.GetString("CORS_ALLOWED_ORIGIN", "http://localhost:3000")},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	r.Use(app.RateLimiterMiddleware)
 
 	// Set a timeout value on the request context (ctx), that will signal
