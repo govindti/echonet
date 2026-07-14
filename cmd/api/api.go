@@ -106,7 +106,7 @@ func (app *Application) mount() *chi.Mux {
 	r.Route("/api", func(r chi.Router) {
 
 		r.Route("/v1", func(r chi.Router) {
-			r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
+			r.Get("/health", app.healthCheckHandler)
 
 			docsURL := fmt.Sprintf("http://%s/api/v1/docs/doc.json", app.config.apiURL)
 			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
