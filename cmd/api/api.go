@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"expvar"
 	"fmt"
 	"net/http"
 	"os"
@@ -116,7 +117,9 @@ func (app *Application) mount() *chi.Mux {
 	r.Route("/api", func(r chi.Router) {
 
 		r.Route("/v1", func(r chi.Router) {
+			// oprations
 			r.Get("/health", app.healthCheckHandler)
+			r.With(app.BasicAuthMiddleware()).Get("/metrics", expvar.Handler().ServeHTTP)
 
 			docsURL := fmt.Sprintf("http://%s/api/v1/docs/doc.json", app.config.apiURL)
 			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
