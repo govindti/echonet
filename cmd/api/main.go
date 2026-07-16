@@ -16,7 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const version = "0.0.1"
+const version = ""
 
 //	@title			EchoNet API
 //	@description	A Social Media API for Go Devs
