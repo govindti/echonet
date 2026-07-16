@@ -8,7 +8,7 @@ on:
 jobs:
   audit:
     name: Audit
-    runs-on: fedora-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -26,11 +26,11 @@ jobs:
       - name: Run go vet
         run: go vet -v ./...
 
-      -name: Install staticcheck
+      - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
       
       - name: Run staticcheck
         run: staticcheck ./...
       
-      -name: Run go Tests
+      - name: Run go Tests
         run: go test -v ./...
