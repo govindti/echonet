@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"expvar"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,14 +15,12 @@ import (
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 
-	"github.com/govindti/echonet/docs" // this is req for generating swagger docs
 	"github.com/govindti/echonet/internal/auth"
 	"github.com/govindti/echonet/internal/env"
 	"github.com/govindti/echonet/internal/mailer"
 	"github.com/govindti/echonet/internal/ratelimiter"
 	"github.com/govindti/echonet/internal/store"
 	"github.com/govindti/echonet/internal/store/cache"
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Application struct {
@@ -119,10 +116,8 @@ func (app *Application) mount() *chi.Mux {
 		r.Route("/v1", func(r chi.Router) {
 			// oprations
 			r.Get("/health", app.healthCheckHandler)
+			app.mountDocs(r)
 			r.With(app.BasicAuthMiddleware()).Get("/metrics", expvar.Handler().ServeHTTP)
-
-			docsURL := fmt.Sprintf("http://%s/api/v1/docs/doc.json", app.config.apiURL)
-			r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 			r.Route("/posts", func(r chi.Router) {
 				r.Use(app.AuthTokenMiddleware)
@@ -162,11 +157,6 @@ func (app *Application) mount() *chi.Mux {
 }
 
 func (app *Application) run(mux *chi.Mux) error {
-	// Docs
-	docs.SwaggerInfo.Version = version
-	docs.SwaggerInfo.Host = app.config.apiURL
-	docs.SwaggerInfo.BasePath = "/api/v1"
-
 	// Implementation of the run method
 
 	srv := &http.Server{
